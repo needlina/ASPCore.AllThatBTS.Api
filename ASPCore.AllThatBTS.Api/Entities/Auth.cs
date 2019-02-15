@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASPCore.AllThatBTS.Api.BizDac
+namespace ASPCore.AllThatBTS.Api.Entities
 {
-    public class UserRepository
+    public class Auth
     {
     }
 }

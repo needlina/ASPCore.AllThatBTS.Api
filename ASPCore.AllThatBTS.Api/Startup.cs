@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Filter;
+using ASPCore.AllThatBTS.Api.Middleware;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Text;
 
 namespace ASPCore.AllThatBTS.Api
 {
@@ -31,22 +26,19 @@ namespace ASPCore.AllThatBTS.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // AutoMapper Add Profile
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "All That BTS API", Version = "v1" });
-                //c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                //{
-                //    In = "header",
-                //    Description = "Please insert JWT with Bearer into field",
-                //    Name = "Authorization",
-                //    Type = "apiKey"
-                //});
-
-                //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                //{
-                //    { "Bearer", new string[] { } }
-                //});
                 c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
             });
 
@@ -84,6 +76,10 @@ namespace ASPCore.AllThatBTS.Api
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
+
+            // Global Error Handling + NLog.Logger
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c =>

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASPCore.AllThatBTS.Api.Model
+namespace ASPCore.AllThatBTS.Api.Services
 {
-    public class AuthModel
+    public class AuthService
     {
-
     }
 }
