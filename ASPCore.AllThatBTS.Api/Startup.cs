@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
+using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 
@@ -42,7 +45,7 @@ namespace ASPCore.AllThatBTS.Api
                 c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
             });
 
-            var key = Encoding.ASCII.GetBytes("!#@FSLEFDSFEdsefd");
+            var key = Encoding.ASCII.GetBytes(AppConfiguration.JwtSecret);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

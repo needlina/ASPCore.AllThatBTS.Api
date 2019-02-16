@@ -1,9 +1,12 @@
 ﻿using ASPCore.AllThatBTS.Api.Entities;
 using ASPCore.AllThatBTS.Api.Model;
-using ASPCore.AllThatBTS.Api.Services;
+using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace ASPCore.AllThatBTS.Api.Controllers
@@ -14,13 +17,18 @@ namespace ASPCore.AllThatBTS.Api.Controllers
     {
         protected readonly UserService userService;
         protected readonly IMapper mapper;
+        protected readonly Logger logger;
 
         public UserController(IMapper _mapper)
         {
-            UserService userService = new UserService();
+            userService = new UserService();
             mapper = _mapper;
+
+            string logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
+            logger = NLog.Web.NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
         }
 
+        [AllowAnonymous]
         [HttpPost("MakeUser")]
         public Response MakeUser(MakeUserM user)
         {
@@ -34,17 +42,21 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             if(result > 0)
             {
                 response.Status = ((int)HttpStatusCode.OK).ToString();
+                response.Message = "사용자 생성에 성공하였습니다.";
+                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.OK).ToString();
+                response.Status = ((int)HttpStatusCode.BadRequest).ToString();
                 response.ErrMsg = "사용자 생성에 실패하였습니다.";
+                logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
             return response;
 
         }
 
+        [Authorize]
         [HttpGet("ReadUser")]
         public Response<ReadUserM> ReadUser(string userNo)
         {
@@ -57,16 +69,19 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.Result = user;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
+                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
                 response.Status = ((int)HttpStatusCode.NotFound).ToString();
                 response.ErrMsg = "사용자가 존재하지 않습니다.";
+                logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
             return response;
         }
 
+        [Authorize]
         [HttpGet("ReadAllUser")]
         public ListResponse<ReadUserM> ReadAllUser()
         {
@@ -79,17 +94,20 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.ListResult = userList;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
+                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
                 response.Status = ((int)HttpStatusCode.NotFound).ToString();
                 response.ErrMsg = "사용자가 존재하지 않습니다.";
+                logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
             return response;
 
         }
 
+        [Authorize]
         [HttpPost("ModifyUser")]
         public Response ModifyUser(ModifyUserM user)
         {
@@ -103,16 +121,20 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             if (result > 0)
             {
                 response.Status = ((int)HttpStatusCode.OK).ToString();
+                response.Message = "사용자를 수정하였습니다.";
+                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                response.ErrMsg = "사용자 저장에 실패하였습니다.";
+                response.ErrMsg = "사용자 수정에 실패하였습니다.";
+                logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
             return response;
         }
 
+        [Authorize]
         [HttpGet("EraseUser")]
         public Response EraseUser(string userNo)
         {
@@ -124,11 +146,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             if (result > 0)
             {
                 response.Status = ((int)HttpStatusCode.OK).ToString();
+                response.Message = "사용자를 삭제하였습니다.";
+                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
                 response.Status = ((int)HttpStatusCode.OK).ToString();
                 response.ErrMsg = "사용자 삭제에 실패하였습니다.";
+                logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
             return response;

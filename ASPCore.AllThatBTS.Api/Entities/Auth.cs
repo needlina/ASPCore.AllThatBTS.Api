@@ -1,11 +1,30 @@
-﻿using System;
+﻿using NPoco;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Entities
 {
-    public class Auth
+    [TableName("TB_AUTH")]
+    public class AuthT
     {
+        [Column("USER_NO")]
+        public string UserNo { get; set; }
+        [Column("ACCESS_TOKEN")]
+        public string AccessToken { get; set; }
+        [Column("REFRESH_TOKEN")]
+        public string RefreshToken { get; set; }
+        [Column("SCOPE")]
+        public string Scope { get; set; }
+        [Column("ACCESS_EXPIRE_DT")]
+        public DateTime AccessTokenExpireDate { get; set; }
+        [Column("REFRESH_EXPIRE_DT")]
+        public DateTime RefreshTokenExpireDate { get; set; }
+        [Column("CREATE_DT")]
+        public DateTime CreateDatetime { get; set; }
+        [Column("UPDATE_DT")]
+        public DateTime UpdateDatetime { get; set; }
+
     }
 }

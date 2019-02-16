@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using ASPCore.AllThatBTS.Api.Common;
+﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Middleware
 {
@@ -40,6 +39,11 @@ namespace ASPCore.AllThatBTS.Api.Middleware
             if (exception is NotFoundException) code = HttpStatusCode.NotFound;
             else if (exception is UnauthorizedException) code = HttpStatusCode.Unauthorized;
             else if (exception is BadRequestException) code = HttpStatusCode.BadRequest;
+
+            string logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
+            var logger = NLog.Web.NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
+
+            logger.Log(NLog.LogLevel.Error, exception);
 
             Response response = new Response()
             {

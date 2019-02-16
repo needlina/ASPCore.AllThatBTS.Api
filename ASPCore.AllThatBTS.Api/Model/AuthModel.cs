@@ -5,8 +5,15 @@ using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Model
 {
-    public class AuthModel
+    public class Token
     {
-
+        public string UserNo { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
+        public DateTime AccessTokenExpireDate { get; set; }
+        public DateTime RefreshTokenExpireDate { get; set; }
+        public string Scope { get; set; }
+        public DateTime CreateDatetime { get; set; }
+        public DateTime UpdateDatetime { get; set; }
     }
 }

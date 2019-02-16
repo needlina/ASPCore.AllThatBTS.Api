@@ -20,6 +20,9 @@ namespace ASPCore.AllThatBTS.Api.Common
             CreateMap<MakeUserM, UserT>();
             CreateMap<ReadUserM, UserT>();
             CreateMap<ModifyUserM, UserT>();
+
+            CreateMap<AuthT, Token>();
+            CreateMap<Token, AuthT>();
         }
     }
 }

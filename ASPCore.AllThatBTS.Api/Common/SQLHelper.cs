@@ -11,7 +11,8 @@ namespace ASPCore.AllThatBTS.Api.Common
         public static string GetSqlByMethodName(string methodName)
         {
             string sql = string.Empty;
-            string path = path = Path.Combine(Directory.GetCurrentDirectory(), @"\SQL\" + methodName + ".sql");
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string path = String.Concat(currentDirectory, @"\SQL\" + methodName + ".sql");
             if (File.Exists(path))
             {
                 sql = File.ReadAllText(path);

@@ -21,14 +21,15 @@ namespace ASPCore.AllThatBTS.Api.Model
         public string Email { get; set; }
         public string AuthType { get; set; }
         public string ConfirmYN { get; set; }
+        public Token Token { get; set; }
         public DateTime CreateDatetime { get; set; }
         public DateTime UpdateDatetime { get; set; }
     }
 
     public class ModifyUserM
     {
+        public string UserNo { get; set; }
         public string NickName { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
     }
 }
