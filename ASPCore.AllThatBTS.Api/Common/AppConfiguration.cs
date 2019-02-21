@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,32 @@ namespace ASPCore.AllThatBTS.Api.Common
                 return GetJwtSecret();
             }
         }
+
+        public static string NLogPath
+        {
+            get
+            {
+                return GetNLogPath();
+            }
+        }
+
+        private static string GetNLogPath()
+        {
+            GlobalDiagnosticsContext.Set("configDir", Path.Combine(Directory.GetCurrentDirectory(), "NLogFile"));
+            string logConfigPath = string.Empty;
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.Development.config");
+            }
+            else
+            {
+                logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
+            }
+
+            return logConfigPath;
+        }
+
         private static IConfigurationSection appSetting
         {
             get

@@ -6,25 +6,8 @@ using System.Reflection;
 
 namespace ASPCore.AllThatBTS.Api.Repository
 {
-    public class UserRepository
+    public class UserRepository : BaseRepository
     {
-        private string connectionString;
-
-        public UserRepository()
-        {
-            connectionString = AppConfiguration.SqlDataConnection;
-        }
-
-        public IDatabase Connection
-        {
-            get
-            {
-                return new Database(connectionString,
-                                DatabaseType.MySQL,
-                                MySql.Data.MySqlClient.MySqlClientFactory.Instance);
-            }
-        }
-
         public UserT SelectUserByEmail(string email)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);

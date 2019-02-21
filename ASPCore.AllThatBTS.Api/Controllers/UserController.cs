@@ -1,9 +1,11 @@
-﻿using ASPCore.AllThatBTS.Api.Entities;
+﻿using ASPCore.AllThatBTS.Api.Common;
+using ASPCore.AllThatBTS.Api.Entities;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NLog;
 using System.Collections.Generic;
 using System.IO;
@@ -24,14 +26,18 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             userService = new UserService();
             mapper = _mapper;
 
-            string logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
-            logger = NLog.Web.NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
+            logger = NLog.Web.NLogBuilder.ConfigureNLog(AppConfiguration.NLogPath).GetCurrentClassLogger();
         }
 
         [AllowAnonymous]
         [HttpPost("MakeUser")]
         public Response MakeUser(MakeUserM user)
         {
+            if(ModelState.IsValid)
+            {
+                throw new BadRequestException("입력값을 확인해주세요.", ModelState.ToString());
+            }
+
             int result = 0;
             Response response = new Response();
 

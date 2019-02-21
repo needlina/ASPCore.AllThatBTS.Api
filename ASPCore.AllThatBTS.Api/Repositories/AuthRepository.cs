@@ -7,25 +7,8 @@ using System.Reflection;
 
 namespace ASPCore.AllThatBTS.Api.Repository
 {
-    public class AuthRepository
+    public class AuthRepository : BaseRepository
     {
-        private string connectionString;
-
-        public AuthRepository()
-        {
-            connectionString = AppConfiguration.SqlDataConnection;
-        }
-
-        public IDatabase Connection
-        {
-            get
-            {
-                return new Database(connectionString,
-                                DatabaseType.MySQL,
-                                MySql.Data.MySqlClient.MySqlClientFactory.Instance);
-            }
-        }
-
         public int UpsertToken(AuthT apiToken)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);

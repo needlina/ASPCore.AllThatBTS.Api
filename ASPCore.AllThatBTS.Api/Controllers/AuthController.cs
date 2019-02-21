@@ -3,18 +3,12 @@ using ASPCore.AllThatBTS.Api.Entities;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Controllers
 {
@@ -33,8 +27,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             userService = new UserService();
             mapper = _mapper;
 
-            string logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
-            logger = NLog.Web.NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
+            logger = NLog.Web.NLogBuilder.ConfigureNLog(AppConfiguration.NLogPath).GetCurrentClassLogger();
         }
 
         /// <summary>

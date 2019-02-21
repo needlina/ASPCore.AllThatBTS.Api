@@ -3,6 +3,8 @@ using ASPCore.AllThatBTS.Api.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using NLog;
+using NLog.Web;
 using System;
 using System.IO;
 using System.Net;
@@ -40,10 +42,21 @@ namespace ASPCore.AllThatBTS.Api.Middleware
             else if (exception is UnauthorizedException) code = HttpStatusCode.Unauthorized;
             else if (exception is BadRequestException) code = HttpStatusCode.BadRequest;
 
-            string logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
-            var logger = NLog.Web.NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
+            GlobalDiagnosticsContext.Set("configDir", Path.Combine(Directory.GetCurrentDirectory(), "NLogFile"));
+            string logConfigPath = string.Empty;
 
-            logger.Log(NLog.LogLevel.Error, exception);
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.Development.config");
+            }
+            else
+            {
+                logConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "nlog.config");
+            }
+
+            var logger = NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
+
+            logger.Log(LogLevel.Error, exception);
 
             Response response = new Response()
             {
