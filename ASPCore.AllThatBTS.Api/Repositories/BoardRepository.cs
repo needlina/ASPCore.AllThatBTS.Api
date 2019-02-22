@@ -1,4 +1,5 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
+using ASPCore.AllThatBTS.Api.Entities;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -13,17 +14,18 @@ namespace ASPCore.AllThatBTS.Api.Repositories
         /// <param name="boardId">게시판 ID</param>
         /// <param name="pageNo">페이지 번호</param>
         /// <returns></returns>
-        public BoardPageInfoT SelectBoardPageInfo(string boardId, int pageNo)
+        public BoardPageInfoT SelectBoardPageInfo(string boardId, int pageNo, int pageSize)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
 
             var parameters = new
             {
                 BOARD_ID = boardId,
-                PAGE_NO = pageNo
+                PAGE_NO = pageNo,
+                PAGE_SIZE = pageSize
             };
 
-            return Connection.Execute(sql, parameters);
+            return Connection.SingleOrDefault<BoardPageInfoT>(sql, parameters);
         }
 
         /// <summary>
@@ -103,11 +105,12 @@ namespace ASPCore.AllThatBTS.Api.Repositories
 
             var parameters = new
             {
-                BOARD_ID = boardId,
-                PAGE_SIZE = pageSize,
-                PAGE_NO = pageNo,
-                SEARCH_TYPE = searchType,
-                SEARCH_KEYWORD = searchKeyword
+                BOARD_ID = article.BoardId,
+                CATEGORY_ID = article.CategoryId,
+                SUBJECT = article.Subject,
+                CONTENTS = article.Contents,
+                NICKNAME = article.NickName,
+                SECRET = article.Secret
             };
 
             return Connection.Execute(sql, parameters);
@@ -124,11 +127,13 @@ namespace ASPCore.AllThatBTS.Api.Repositories
 
             var parameters = new
             {
-                BOARD_ID = boardId,
-                PAGE_SIZE = pageSize,
-                PAGE_NO = pageNo,
-                SEARCH_TYPE = searchType,
-                SEARCH_KEYWORD = searchKeyword
+                SEQ = article.Seq,
+                BOARD_ID = article.BoardId,
+                CATEGORY_ID = article.CategoryId,
+                SUBJECT = article.Subject,
+                CONTENTS = article.Contents,
+                NICKNAME = article.NickName,
+                SECRET = article.Secret
             };
 
             return Connection.Execute(sql, parameters);
@@ -182,7 +187,7 @@ namespace ASPCore.AllThatBTS.Api.Repositories
         /// </summary>
         /// <param name="comment">댓글 모델</param>
         /// <returns></returns>
-        public CommentT InsertComment(CommentT comment)
+        public int InsertComment(CommentT comment)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
 

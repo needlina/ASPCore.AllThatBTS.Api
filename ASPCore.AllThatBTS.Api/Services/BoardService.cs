@@ -1,4 +1,5 @@
-﻿using ASPCore.AllThatBTS.Api.Repositories;
+﻿using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Repositories;
 using System.Collections.Generic;
 
 namespace ASPCore.AllThatBTS.Api.Services
@@ -19,9 +20,9 @@ namespace ASPCore.AllThatBTS.Api.Services
         /// <param name="boardId">게시판 ID</param>
         /// <param name="pageNo">페이지 번호</param>
         /// <returns></returns>
-        public BoardPageInfoT GetBoardPageInfo(string boardId, int pageNo)
+        public BoardPageInfoT GetBoardPageInfo(string boardId, int pageNo, int pageSize)
         {
-            return boardRepository.SelectBoardPageInfo(boardId, pageNo);
+            return boardRepository.SelectBoardPageInfo(boardId, pageNo, pageSize);
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace ASPCore.AllThatBTS.Api.Services
         /// </summary>
         /// <param name="comment">댓글 모델</param>
         /// <returns></returns>
-        public CommentT CreateComment(CommentT comment)
+        public int CreateComment(CommentT comment)
         {
             return boardRepository.InsertComment(comment);
         }
