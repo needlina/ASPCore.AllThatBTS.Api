@@ -1,5 +1,7 @@
 ﻿using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Repositories;
+using NPoco;
 using System.Collections.Generic;
 
 namespace ASPCore.AllThatBTS.Api.Services
@@ -15,17 +17,6 @@ namespace ASPCore.AllThatBTS.Api.Services
 
         #region 게시판
         /// <summary>
-        /// 게시판 조회 페이지 컨트롤
-        /// </summary>
-        /// <param name="boardId">게시판 ID</param>
-        /// <param name="pageNo">페이지 번호</param>
-        /// <returns></returns>
-        public BoardPageInfoT GetBoardPageInfo(string boardId, int pageNo, int pageSize)
-        {
-            return boardRepository.SelectBoardPageInfo(boardId, pageNo, pageSize);
-        }
-
-        /// <summary>
         /// 게시판의 카테고리 리스트 조회
         /// </summary>
         /// <param name="boardId">게시판 ID</param>
@@ -40,19 +31,39 @@ namespace ASPCore.AllThatBTS.Api.Services
         /// <summary>
         /// 게시물 리스트 조회
         /// </summary>
-        /// <param name="boardId">게시판ID</param>
-        /// <param name="pageSize">페이지 사이즈</param>
-        /// <param name="pageNo">페이지 번호</param>
-        /// <param name="searchType">검색 조건 타입 : 제목,내용,작성자</param>
-        /// <param name="searchKeyword">검색어</param>
+        /// <param name="pageNo"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageBlockSize"></param>
+        /// <param name="boardId"></param>
+        /// <param name="categoryId"></param>
+        /// <param name="searchType"></param>
+        /// <param name="searchKeyword"></param>
         /// <returns></returns>
-        public List<ArticleT> GetBoardList(string boardId,
-                                              int pageSize,
-                                              int pageNo,
-                                              string searchType,
-                                              string searchKeyword)
+        public Page<ArticleT> GetBoardList(int pageNo,
+                                       int pageSize,
+                                       int pageBlockSize,
+                                       string boardId,
+                                       string categoryId,
+                                       string searchType,
+                                       string searchKeyword)
         {
-            return boardRepository.SelectBoardList(boardId, pageSize, pageNo, searchType, searchKeyword);
+            
+
+
+            Page<ArticleT> pageEntity = boardRepository.SelectBoardList(pageNo,
+                                                                        pageSize,
+                                                                        pageBlockSize,
+                                                                        boardId,
+                                                                        categoryId,
+                                                                        searchType,
+                                                                        searchKeyword);
+
+
+
+
+            return pageEntity;
+
+
         }
 
         /// <summary>

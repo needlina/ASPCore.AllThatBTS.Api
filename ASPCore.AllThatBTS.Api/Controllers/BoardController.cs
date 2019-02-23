@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using ASPCore.AllThatBTS.Api.Common;
+﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Services;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
+using System.Collections.Generic;
+using System.Net;
 
 namespace ASPCore.AllThatBTS.Api.Controllers
 {
@@ -31,30 +27,8 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             logger = NLog.Web.NLogBuilder.ConfigureNLog(AppConfiguration.NLogPath).GetCurrentClassLogger();
         }
 
-        public Response<BoardPageInfoM> ReadBoardPageInfo([FromBody]string boardId, [FromBody]int pageNo, [FromBody]int pageSize)
-        {
-            Response<BoardPageInfoM> response = new Response<BoardPageInfoM>();
-
-            BoardPageInfoT entity = boardService.GetBoardPageInfo(boardId, pageNo, pageSize);
-            BoardPageInfoM model = mapper.Map<BoardPageInfoT, BoardPageInfoM>(entity);
-
-            if (model != null)
-            {
-                response.Result = model;
-                response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
-            }
-            else
-            {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "게시판 페이지 정보가 없습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
-            }
-
-            return response;
-
-        }
-
+        #region 게시판
+        [HttpGet("ReadBoardCategoryList")]
         public ListResponse<BoardCategoryM> ReadBoardCategoryList(string boardId)
         {
             ListResponse<BoardCategoryM> response = new ListResponse<BoardCategoryM>();
@@ -78,34 +52,67 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             return response;
         }
 
-        public List<ArticleM> ReadBoardList(string boardId,
-                                              int pageSize,
-                                              int pageNo,
-                                              string searchType,
-                                              string searchKeyword)
+
+        #endregion
+
+        #region 게시물
+        [HttpPost("ReadBoardList")]
+        public Response<BoardListM> ReadBoardList(RequestBoardListM request)
         {
-            ListResponse<ArticleM> response = new ListResponse<ArticleM>();
+            Response<BoardListM> response = new Response<BoardListM>();
 
-            List<ArticleT> entities = boardService.GetBoardList(boardId, pageSize, pageNo, searchType, searchKeyword);
-            List<ArticleM> modelList = mapper.Map<List<ArticleT>, List<ArticleM>>(entities);
+            NPoco.Page<ArticleT> entity = boardService.GetBoardList(request.PageNo,
+                                                      request.PageSize,
+                                                      request.PageBlockSize,
+                                                      request.BoardId,
+                                                      request.CategoryId,
+                                                      request.SearchType,
+                                                      request.SearchKeyword);
 
-            if (modelList.Count > 0)
+            int pageMaxNo = (int)((entity.TotalPages / request.PageBlockSize) + 1);
+            int currPageBlock = (int)((request.PageNo / request.PageBlockSize) + 1);
+
+            BoardPageInfoT pageInfoT = new BoardPageInfoT()
             {
-                response.ListResult = modelList;
+                BoardId = request.BoardId,
+                CurrentPageNo = request.PageNo,
+                PageSize = request.PageSize,
+                TotalCount = (int)entity.TotalItems,
+                TotalPages = (int)entity.TotalPages,
+                PageBlockSize = request.PageBlockSize,
+                NextPageBlockYN = currPageBlock < pageMaxNo,
+                PrevPageBlockYN = currPageBlock > 1
+            };
+
+            List<ArticleM> listModel = mapper.Map<List<ArticleT>, List<ArticleM>>(entity.Items);
+            BoardPageInfoM pageInfoM = mapper.Map<BoardPageInfoT, BoardPageInfoM>(pageInfoT);
+
+            BoardListM model = new BoardListM()
+            {
+                ListItems = listModel,
+                BoardPageInfo = pageInfoM
+            };
+
+
+
+            if (model != null)
+            {
+                response.Result = model;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
                 logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
                 response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "게시물이 존재하지 않습니다.";
+                response.ErrMsg = "게시물 정보가 없습니다.";
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
             return response;
         }
 
-        public ArticleM SelectArticle(string seq)
+        [HttpGet("ReadArticle")]
+        public Response<ArticleM> ReadArticle(string seq)
         {
             Response<ArticleM> response = new Response<ArticleM>();
 
@@ -128,6 +135,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             return response;
         }
 
+        [HttpPost("WriteArticle")]
         public Response WriteArticle(WriteArticleM article)
         {
             int result = 0;
@@ -153,6 +161,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             return response;
         }
 
+        [HttpPost("ModifyArticle")]
         public Response ModifyArticle(ModifyArticleM article)
         {
             int result = 0;
@@ -201,7 +210,10 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
             return response;
         }
+        #endregion
 
+        #region 댓글
+        [HttpGet("ReadCommentList")]
         public ListResponse<CommentM> ReadCommentList(string seq,
                                                          int pageSize,
                                                          int pageNo)
@@ -226,7 +238,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
             return response;
         }
-
+        [HttpPost("WriteComment")]
         public Response WriteComment(WriteCommentM comment)
         {
             int result = 0;
@@ -251,8 +263,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
             return response;
         }
-
-
+        [HttpGet("EraseComment")]
         public Response EraseComment(string commentSeq)
         {
             int result = 0;
@@ -275,7 +286,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
             return response;
         }
-
+        [HttpGet("ReadSubCommentList")]
         public ListResponse<CommentM> ReadSubCommentList(string seq,
                                                  string commentSeq,
                                                  int pageSize,
@@ -301,7 +312,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
             return response;
         }
-
+        [HttpPost("WriteSubComment")]
         public Response WriteSubComment(WriteSubCommentM comment)
         {
             int result = 0;
@@ -327,7 +338,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             return response;
         }
 
-
+        [HttpGet("EraseSubComment")]
         public Response EraseSubComment(string subCommentSeq)
         {
             int result = 0;
@@ -350,34 +361,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
             return response;
         }
-
-
-        //// 게시판 조회 페이지 컨트롤
-        //[HttpGet("ReadUser")]
-        //public Response<ReadUserM> ReadUser(string userNo)
-        //{
-        //    Response<ReadUserM> response = new Response<ReadUserM>();
-
-        //    UserT userEntity = userService.GetUser(userNo);
-        //    ReadUserM user = mapper.Map<UserT, ReadUserM>(userEntity);
-
-        //    if (user != null)
-        //    {
-        //        response.Result = user;
-        //        response.Status = ((int)HttpStatusCode.OK).ToString();
-        //        logger.Log(LogLevel.Info, response.Message);
-        //    }
-        //    else
-        //    {
-        //        response.Status = ((int)HttpStatusCode.NotFound).ToString();
-        //        response.ErrMsg = "사용자가 존재하지 않습니다.";
-        //        logger.Log(LogLevel.Warn, response.ErrMsg);
-        //    }
-
-        //    return response;
-        //}
-
-
+        #endregion
 
         // 게시판 조회 리스트
         // 게시물 작성

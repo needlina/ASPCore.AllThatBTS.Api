@@ -1,5 +1,8 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Enum;
+using NPoco;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -14,19 +17,7 @@ namespace ASPCore.AllThatBTS.Api.Repositories
         /// <param name="boardId">게시판 ID</param>
         /// <param name="pageNo">페이지 번호</param>
         /// <returns></returns>
-        public BoardPageInfoT SelectBoardPageInfo(string boardId, int pageNo, int pageSize)
-        {
-            string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
-
-            var parameters = new
-            {
-                BOARD_ID = boardId,
-                PAGE_NO = pageNo,
-                PAGE_SIZE = pageSize
-            };
-
-            return Connection.SingleOrDefault<BoardPageInfoT>(sql, parameters);
-        }
+        
 
         /// <summary>
         /// 게시판의 카테고리 리스트 조회
@@ -56,24 +47,57 @@ namespace ASPCore.AllThatBTS.Api.Repositories
         /// <param name="searchType">검색 조건 타입 : 제목,내용,작성자</param>
         /// <param name="searchKeyword">검색어</param>
         /// <returns></returns>
-        public List<ArticleT> SelectBoardList(string boardId,
+        public Page<ArticleT> SelectBoardList(int pageNo,
                                               int pageSize,
-                                              int pageNo,
+                                              int pageBlockSize,
+                                              string boardId,
+                                              string categoryId,
                                               string searchType,
                                               string searchKeyword)
         {
+
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
+            var parameters = new object();
 
-            var parameters = new
+            switch (searchType)
             {
-                BOARD_ID = boardId,
-                PAGE_SIZE = pageSize,
-                PAGE_NO = pageNo,
-                SEARCH_TYPE = searchType,
-                SEARCH_KEYWORD = searchKeyword
-            };
+                case SearchType.All:
+                    parameters = new
+                    {
+                        BOARD_ID = boardId,
+                        CATEGORY_ID = categoryId,
+                        SEARCH_TYPE = searchType,
+                        SUBJECT = searchKeyword,
+                        CONTENTS = searchKeyword
+                    };
+                    break;
+                case SearchType.Subject:
+                    parameters = new
+                    {
+                        BOARD_ID = boardId,
+                        CATEGORY_ID = categoryId,
+                        SUBJECT = searchKeyword,
+                        CONTENTS = ""
+                    };
+                    break;
+                case SearchType.Contents:
+                    parameters = new
+                    {
+                        BOARD_ID = boardId,
+                        CATEGORY_ID = categoryId,
+                        SUBJECT = "",
+                        CONTENTS = searchKeyword
 
-            return Connection.Fetch<ArticleT>(sql, parameters);
+                    };
+                    break;
+                default:
+                    break;
+            }
+
+            Page<ArticleT> pageEntity = Connection.Page<ArticleT>(pageNo, pageSize, sql, parameters);
+
+
+            return pageEntity;
         }
 
         /// <summary>

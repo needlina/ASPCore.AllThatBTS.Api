@@ -23,6 +23,9 @@ namespace ASPCore.AllThatBTS.Api.Common
 
             CreateMap<AuthT, Token>();
             CreateMap<Token, AuthT>();
+
+            CreateMap<ArticleM, ArticleT>();
+            CreateMap<ArticleT, ArticleM>();
         }
     }
 }

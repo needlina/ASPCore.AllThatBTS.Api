@@ -97,7 +97,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("RefreshToken")]
-        public Token RefreshTokenAsync(string refreshToken)
+        public Token RefreshToken(string refreshToken)
         {
             Token token = new Token();
             //토큰 검증
