@@ -13,8 +13,6 @@ namespace ASPCore.AllThatBTS.Api.Model
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-        [Required]
-        [RegularExpression(@"([a-zA-Z0-9].*[!,@,#,$,%,^,&,*,?,_,~,-])|([!,@,#,$,%,^,&,*,?,_,~,-].*[a-zA-Z0-9])")]
         public string Password { get; set; }
         public string AuthType { get; set; }
         public string ConfirmYN { get; set; }
