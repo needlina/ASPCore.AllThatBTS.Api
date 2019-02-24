@@ -33,10 +33,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         [HttpPost("MakeUser")]
         public Response MakeUser(MakeUserM user)
         {
-            if(ModelState.IsValid)
-            {
-                throw new BadRequestException("입력값을 확인해주세요.", ModelState.ToString());
-            }
 
             int result = 0;
             Response response = new Response();
