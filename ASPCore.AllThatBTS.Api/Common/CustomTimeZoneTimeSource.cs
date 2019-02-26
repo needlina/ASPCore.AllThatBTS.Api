@@ -1,6 +1,7 @@
 ﻿using NLog.Time;
 using System;
 using System.ComponentModel.DataAnnotations;
+using TimeZoneConverter;
 
 [TimeSource("CustomTimeZone")]
 public class CustomTimeZoneTimeSource : TimeSource
@@ -16,7 +17,7 @@ public class CustomTimeZoneTimeSource : TimeSource
         {
             ZoneName = value;
             ZoneInfo
-                = TimeZoneInfo.FindSystemTimeZoneById(value);
+                = TZConvert.GetTimeZoneInfo(ZoneName);
         }
     }
 
