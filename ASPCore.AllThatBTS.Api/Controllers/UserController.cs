@@ -5,11 +5,10 @@ using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NLog;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
+using System.Reflection;
 
 namespace ASPCore.AllThatBTS.Api.Controllers
 {
@@ -54,6 +53,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
 
         }
@@ -71,7 +71,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.Result = user;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -80,6 +79,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -96,7 +96,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.ListResult = userList;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -105,6 +104,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
 
         }
@@ -133,6 +133,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -158,6 +159,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 

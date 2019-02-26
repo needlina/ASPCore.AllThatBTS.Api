@@ -1,29 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using ASPCore.AllThatBTS.Api.Enum;
 
 namespace ASPCore.AllThatBTS.Api.Common
 {
     public class NotFoundException : BaseException
     {
-        public NotFoundException(string message, string description) : base(message, description, (int)HttpStatusCode.NotFound)
+        public NotFoundException(string message, string description) : base(message, description, HttpStatusCodes.NotFound)
         {
         }
     }
 
     public class UnauthorizedException : BaseException
     {
-        public UnauthorizedException(string message, string description) : base(message, description, (int)HttpStatusCode.Unauthorized)
+        public UnauthorizedException(string message, string description) : base(message, description, HttpStatusCodes.UnAuthorized)
         {
         }
     }
 
     public class BadRequestException : BaseException
     {
-        public BadRequestException(string message, string description) : base(message, description, (int)HttpStatusCode.BadRequest)
+        public BadRequestException(string message, string description) : base(message, description, HttpStatusCodes.BadRequest)
         {
         }
     }
+
+    public class TokenErrorException : BaseException
+    {
+        public TokenErrorException(string message, string description) : base(message, description, HttpStatusCodes.TokenError)
+        {
+        }
+    }
+
 }

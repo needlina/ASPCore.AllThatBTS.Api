@@ -1,10 +1,6 @@
 ﻿using ASPCore.AllThatBTS.Api.Entities;
 using ASPCore.AllThatBTS.Api.Model;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Common
 {
@@ -21,8 +17,8 @@ namespace ASPCore.AllThatBTS.Api.Common
             CreateMap<ReadUserM, UserT>();
             CreateMap<ModifyUserM, UserT>();
 
-            CreateMap<AuthT, Token>();
-            CreateMap<Token, AuthT>();
+            CreateMap<TokenT, TokenM>();
+            CreateMap<TokenM, TokenT>();
 
             CreateMap<ArticleM, ArticleT>();
             CreateMap<ArticleT, ArticleM>();

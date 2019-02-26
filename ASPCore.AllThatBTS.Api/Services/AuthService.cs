@@ -7,6 +7,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TimeZoneConverter;
 
 namespace ASPCore.AllThatBTS.Api.Service
 {
@@ -18,7 +19,7 @@ namespace ASPCore.AllThatBTS.Api.Service
         {
             authRepository = new AuthRepository();
         }
-        public AuthT CreateToken(ReadUserM user)
+        public TokenT CreateToken(ReadUserM user)
         {
 
             // authentication successful so generate jwt token
@@ -39,7 +40,7 @@ namespace ASPCore.AllThatBTS.Api.Service
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
 
-            AuthT apiToken = new AuthT()
+            TokenT apiToken = new TokenT()
             {
                 UserNo = user.UserNo,
                 AccessToken = tokenHandler.WriteToken(token),
@@ -61,44 +62,42 @@ namespace ASPCore.AllThatBTS.Api.Service
             return Guid.NewGuid().ToString().Replace("-", "");
         }
 
-        public AuthT GetToken(string userNo)
+        public TokenT GetToken(string userNo)
         {
             return authRepository.SelectToken(userNo);
         }
 
-        public bool VerifyAccessToken(string accessToken, string refreshToken)
+        /// <summary>
+        /// Access Token 유효성 체크
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <param name="refreshToken"></param>
+        /// <returns></returns>
+        public TokenT ReadAccessToken(string accessToken, string refreshToken)
         {
-            bool validAccessToken = false;
-            bool validRefreshToken = true;
+            TokenT token = authRepository.SelectTokenByRefreshToken(refreshToken);
 
-            SecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(AppConfiguration.GetJwtSecret()));
-            SecurityToken validatedToken = null;
-            var validationParameters = new TokenValidationParameters()
+            if (token != null)
             {
-                ValidAudience = "aud.allthatbts.com",
-                ValidIssuer = "api.allthatbts.com",
-                IssuerSigningKey = key
-            };
+                // Access Token 일치 여부
+                if(token.AccessToken != accessToken)
+                {
+                    throw new TokenErrorException("정상적인 토큰이 아닙니다.", "Invalid Token Error");
+                }
 
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
+                // Refresh Token 만료시간 확인
+                if(token.RefreshTokenExpireDate < CommonHelper.GetDateTimeNow)
+                {
+                    throw new TokenErrorException("Refresh 토큰이 만료되었습니다. 다시 로그인 해주세요.", "Invalid Token Error");
+                }
 
-            validAccessToken = validatedToken != null ? true : false;
-
-            AuthT token = authRepository.SelectTokenByRefreshToken(refreshToken);
-
-            validRefreshToken = token.AccessToken == accessToken ? true : false;
-
-            if (validAccessToken == true && validRefreshToken == true)
-            {
-                return true;
+                return token;
             }
             else
             {
-                return false;
+                throw new TokenErrorException("토큰이 존재하지 않습니다.", "Invalid Token Error");
             }
-
+            
         }
     }
 }

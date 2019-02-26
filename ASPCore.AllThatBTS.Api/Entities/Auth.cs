@@ -1,13 +1,10 @@
 ﻿using NPoco;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Entities
 {
     [TableName("TB_AUTH")]
-    public class AuthT
+    public class TokenT
     {
         [Column("USER_NO")]
         public string UserNo { get; set; }

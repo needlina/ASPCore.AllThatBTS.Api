@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Model
 {
-    public class Token
+    public class TokenM
     {
         public string UserNo { get; set; }
         public string AccessToken { get; set; }

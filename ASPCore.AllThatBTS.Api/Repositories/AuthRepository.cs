@@ -9,7 +9,7 @@ namespace ASPCore.AllThatBTS.Api.Repository
 {
     public class AuthRepository : BaseRepository
     {
-        public int UpsertToken(AuthT apiToken)
+        public int UpsertToken(TokenT apiToken)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
 
@@ -26,7 +26,7 @@ namespace ASPCore.AllThatBTS.Api.Repository
             return Connection.Execute(sql, parameters);
         }
 
-        internal AuthT SelectToken(string userNo)
+        internal TokenT SelectToken(string userNo)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
 
@@ -35,10 +35,10 @@ namespace ASPCore.AllThatBTS.Api.Repository
                 USER_NO = userNo
             };
 
-            return Connection.SingleOrDefault<AuthT>(sql, parameters);
+            return Connection.SingleOrDefault<TokenT>(sql, parameters);
         }
 
-        public AuthT SelectTokenByRefreshToken(string refreshToken)
+        public TokenT SelectTokenByRefreshToken(string refreshToken)
         {
             string sql = SQLHelper.GetSqlByMethodName(MethodBase.GetCurrentMethod().Name);
 
@@ -47,7 +47,7 @@ namespace ASPCore.AllThatBTS.Api.Repository
                 REFRESH_TOKEN = refreshToken
             };
 
-            return Connection.SingleOrDefault<AuthT>(sql, parameters);
+            return Connection.SingleOrDefault<TokenT>(sql, parameters);
         }
     }
 }

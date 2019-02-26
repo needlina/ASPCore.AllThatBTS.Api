@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NLog;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 
 namespace ASPCore.AllThatBTS.Api.Controllers
 {
@@ -40,7 +41,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.ListResult = modelList;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -49,6 +49,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -99,7 +100,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.Result = model;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -108,6 +108,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -123,7 +124,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.Result = model;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -132,6 +132,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -158,6 +159,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -184,6 +186,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -208,6 +211,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
         #endregion
@@ -227,7 +231,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.ListResult = modelList;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -236,6 +239,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
         [HttpPost("WriteComment")]
@@ -261,6 +265,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
         [HttpGet("EraseComment")]
@@ -301,7 +306,6 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             {
                 response.ListResult = modelList;
                 response.Status = ((int)HttpStatusCode.OK).ToString();
-                logger.Log(LogLevel.Info, response.Message);
             }
             else
             {
@@ -310,6 +314,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
         [HttpPost("WriteSubComment")]
@@ -335,6 +340,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
 
@@ -359,19 +365,9 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 logger.Log(LogLevel.Warn, response.ErrMsg);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return response;
         }
         #endregion
-
-        // 게시판 조회 리스트
-        // 게시물 작성
-        // 게시판 카테고리 조회
-        // 게시물 수정
-        // 게시물 삭제
-        // 댓글 리스트 조회 페이지 컨트롤
-        // 댓글 리스트 조회 (ajax 콜)
-        // 댓글 추가
-        // 대댓글 추가
-        // 댓글 삭제 (DeleteFlag)
     }
 }

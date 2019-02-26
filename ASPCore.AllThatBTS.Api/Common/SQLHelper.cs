@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace ASPCore.AllThatBTS.Api.Common
 {
@@ -12,8 +8,9 @@ namespace ASPCore.AllThatBTS.Api.Common
         {
             string sql = string.Empty;
             string currentDirectory = Directory.GetCurrentDirectory();
+
+            //Path.Combine은 Linux 환경에서도 사용이 가능!
             string path = Path.Combine(Directory.GetCurrentDirectory(), "SQL", methodName + ".sql");
-            //string path = String.Concat(currentDirectory, @"\SQL\" + methodName + ".sql");
             if (File.Exists(path))
             {
                 sql = File.ReadAllText(path);

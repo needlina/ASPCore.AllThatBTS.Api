@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ASPCore.AllThatBTS.Api.Common
 {
@@ -50,7 +47,7 @@ namespace ASPCore.AllThatBTS.Api.Common
             return logConfigPath;
         }
 
-        private static IConfigurationSection appSetting
+        private static IConfigurationSection AppSetting
         {
             get
             {
@@ -74,12 +71,12 @@ namespace ASPCore.AllThatBTS.Api.Common
 
         public static string GetSqlConnection()
         {
-            return appSetting["ConnectionString"];
+            return AppSetting["ConnectionString"];
         }
 
         public static string GetJwtSecret()
         {
-            return appSetting["JwtSecret"];
+            return AppSetting["JwtSecret"];
         }
 
     }

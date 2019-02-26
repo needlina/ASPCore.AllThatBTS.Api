@@ -3,12 +3,11 @@ using ASPCore.AllThatBTS.Api.Entities;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 using System;
-using System.Linq;
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 
 namespace ASPCore.AllThatBTS.Api.Controllers
 {
@@ -31,7 +30,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         }
 
         /// <summary>
-        /// 인증 (토큰생성
+        /// 인증 (토큰생성)
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
@@ -51,8 +50,8 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 user = mapper.Map<UserT, ReadUserM>(userEntity);
 
                 // 토큰생성
-                AuthT authEntity = authService.CreateToken(user);
-                Token token = mapper.Map<AuthT, Token>(authEntity);
+                TokenT authEntity = authService.CreateToken(user);
+                TokenM token = mapper.Map<TokenT, TokenM>(authEntity);
                 user.Token = token;
 
             }
@@ -61,6 +60,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 throw new BadRequestException("비밀번호가 올바르지 않습니다.", "비밀번호 오류");
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return user;
 
         }
@@ -72,9 +72,9 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         /// <param name="password"></param>
         /// <returns></returns>
         [HttpPost("ReadToken")]
-        public Token ReadToken(string email, string password)
+        public TokenM ReadToken(string email, string password)
         {
-            Token token = new Token();
+            TokenM token = new TokenM();
             //비밀번호 검증
             bool verified = userService.VerifyUser(email, password);
 
@@ -82,11 +82,11 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             if (verified)
             {
                 UserT userEntity = userService.GetUserByEmail(email);
-                AuthT authEntity = authService.GetToken(userEntity.UserNo);
-                token = mapper.Map<AuthT, Token>(authEntity);
-                
+                TokenT authEntity = authService.GetToken(userEntity.UserNo);
+                token = mapper.Map<TokenT, TokenM>(authEntity);
             }
 
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
             return token;
         }
 
@@ -95,38 +95,30 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         /// </summary>
         /// <param name="refreshToken"></param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost("RefreshToken")]
-        public Token RefreshToken(string refreshToken)
+        public TokenM RefreshToken(string accessToken, string refreshToken)
         {
-            Token token = new Token();
-            //토큰 검증
-            string accessToken = Request.Headers["Authorization"].ToString().Replace("bearer ", "");
+            TokenM tokenModel = new TokenM();
+            TokenT token = authService.ReadAccessToken(accessToken, refreshToken);
 
-            bool verified = authService.VerifyAccessToken(accessToken, refreshToken);
+            DateTime validTo = new JwtSecurityTokenHandler().ReadJwtToken(accessToken).ValidTo;
+            DateTime tokenExpiredTime = CommonHelper.GetDateTime(validTo);
 
-            // 토큰 검증 완료 시
-            if (verified)
+            if (tokenExpiredTime < DateTime.Now)
             {
-                //Get the current claims principal
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-                // Get the claims values
-                var sid = identity.Claims.Where(c => c.Type == ClaimTypes.Sid)
-                                   .Select(c => c.Value).SingleOrDefault();
-
-                UserT userEntity = userService.GetUser(sid);
+                UserT userEntity = userService.GetUser(token.UserNo);
                 ReadUserM user = mapper.Map<UserT, ReadUserM>(userEntity);
 
-                AuthT authEntity = authService.CreateToken(user);
-                token = mapper.Map<AuthT, Token>(authEntity);
+                TokenT authEntity = authService.CreateToken(user);
+                tokenModel = mapper.Map<TokenT, TokenM>(authEntity);
             }
             else
             {
-                throw new Exception("유효하지 않은 Token입니다.");
+                throw new TokenErrorException("토큰 만료 시간이 유효합니다.", "Remain Token EXP");
             }
 
-            return token;
+            logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
+            return tokenModel;
         }
     }
 }
