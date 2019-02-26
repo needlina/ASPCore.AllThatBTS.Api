@@ -11,7 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
+using NLog.Config;
 using NLog.Extensions.Logging;
+using NLog.Time;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 
@@ -29,6 +31,12 @@ namespace ASPCore.AllThatBTS.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            TimeSource.Current = new CustomTimeZoneTimeSource()
+            {
+                Zone = "Korea Standard Time"
+            };
+
             // AutoMapper Add Profile
             var mappingConfig = new MapperConfiguration(mc =>
             {
