@@ -1,5 +1,6 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Enum;
 using ASPCore.AllThatBTS.Api.Repository;
 using System.Collections.Generic;
 
@@ -49,7 +50,7 @@ namespace ASPCore.AllThatBTS.Api.Service
             UserT user = userRepository.SelectUserByEmail(email);
             if(user == null)
             {
-                throw new NotFoundException("사용자가 존재하지 않습니다.", "사용자 없음");
+                throw new NotFoundException("사용자가 존재하지 않습니다.", "사용자 없음", LayerID.UserService);
             }
 
             return CryptoHelper.Crypto.VerifyHashedPassword(user.Password, password);

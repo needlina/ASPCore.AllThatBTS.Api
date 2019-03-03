@@ -1,5 +1,6 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Enum;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
@@ -57,7 +58,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                throw new BadRequestException("비밀번호가 올바르지 않습니다.", "비밀번호 오류");
+                throw new IncorrectDataException("비밀번호가 올바르지 않습니다.", "비밀번호 오류", LayerID.AuthController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -84,6 +85,10 @@ namespace ASPCore.AllThatBTS.Api.Controllers
                 UserT userEntity = userService.GetUserByEmail(email);
                 TokenT authEntity = authService.GetToken(userEntity.UserNo);
                 token = mapper.Map<TokenT, TokenM>(authEntity);
+            }
+            else
+            {
+                throw new IncorrectDataException("비밀번호가 올바르지 않습니다.", "비밀번호 오류", LayerID.AuthController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -114,7 +119,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                throw new TokenErrorException("토큰 만료 시간이 유효합니다.", "Remain Token EXP");
+                throw new BadRequestException("토큰 만료 시간이 유효합니다.", "토큰 오류", LayerID.AuthController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));

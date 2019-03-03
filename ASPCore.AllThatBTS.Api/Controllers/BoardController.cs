@@ -1,11 +1,15 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Enum;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Services;
 using AutoMapper;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using NLog;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -44,9 +48,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "게시판의 카테고리 정보가 없습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new NotFoundException("게시판 카테고리가 없습니다.", "게시판 카테고리 조회 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -61,6 +63,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         public Response<BoardListM> ReadBoardList(RequestBoardListM request)
         {
             Response<BoardListM> response = new Response<BoardListM>();
+
+            RequestBoardListMValidator validator = new RequestBoardListMValidator();
+            ValidationResult results = validator.Validate(request);
+
+            if(results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
 
             NPoco.Page<ArticleT> entity = boardService.GetBoardList(request.PageNo,
                                                       request.PageSize,
@@ -103,9 +113,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "게시물 정보가 없습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new NotFoundException("게시물 목록이 없습니다.", "게시물 없음", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -127,9 +135,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "게시물이 존재하지 않습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new NotFoundException("게시글이 없습니다.", "게시글 없음", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -141,6 +147,15 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         {
             int result = 0;
             Response response = new Response();
+
+            WriteArticleMValidator validator = new WriteArticleMValidator();
+            ValidationResult results = validator.Validate(article);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
+
 
             ArticleT entity = mapper.Map<WriteArticleM, ArticleT>(article);
 
@@ -154,9 +169,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.BadRequest).ToString();
-                response.ErrMsg = "글 작성이 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("글 작성이 실패하였습니다.", "글 작성 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -168,6 +181,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         {
             int result = 0;
             Response response = new Response();
+
+            ModifyArticleMValidator validator = new ModifyArticleMValidator();
+            ValidationResult results = validator.Validate(article);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
 
             ArticleT entity = mapper.Map<ModifyArticleM, ArticleT>(article);
 
@@ -181,9 +202,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.BadRequest).ToString();
-                response.ErrMsg = "글 수정이 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("글 수정이 실패하였습니다.", "글 수정 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -206,9 +225,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.OK).ToString();
-                response.ErrMsg = "글 삭제가 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("글 삭제가 실패하였습니다.", "글 삭제 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -218,13 +235,20 @@ namespace ASPCore.AllThatBTS.Api.Controllers
 
         #region 댓글
         [HttpGet("ReadCommentList")]
-        public ListResponse<CommentM> ReadCommentList(string seq,
-                                                         int pageSize,
-                                                         int pageNo)
+        public ListResponse<CommentM> ReadCommentList(RequestCommentListM request)
         {
             ListResponse<CommentM> response = new ListResponse<CommentM>();
 
-            List<CommentT> entities = boardService.GetCommentList(seq, pageSize, pageNo);
+            RequestCommentListMValidator validator = new RequestCommentListMValidator();
+            ValidationResult results = validator.Validate(request);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
+
+
+            List<CommentT> entities = boardService.GetCommentList(request.Seq, request.PageSize, request.PageNo);
             List<CommentM> modelList = mapper.Map<List<CommentT>, List<CommentM>>(entities);
 
             if (modelList.Count > 0)
@@ -234,9 +258,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "댓글이 존재하지 않습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new NotFoundException("댓글이 존재하지 않습니다.", "댓글 조회 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -247,6 +269,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         {
             int result = 0;
             Response response = new Response();
+
+            WriteCommentMValidator validator = new WriteCommentMValidator();
+            ValidationResult results = validator.Validate(comment);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
 
             CommentT entity = mapper.Map<WriteCommentM, CommentT>(comment);
 
@@ -260,9 +290,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.BadRequest).ToString();
-                response.ErrMsg = "댓글 작성이 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("댓글 작성이 실패하였습니다.", "댓글 작성 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -284,22 +312,25 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.OK).ToString();
-                response.ErrMsg = "댓글 삭제가 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("댓글 삭제가 실패하였습니다.", "댓글 삭제 오류", LayerID.BoardController);
             }
 
             return response;
         }
         [HttpGet("ReadSubCommentList")]
-        public ListResponse<CommentM> ReadSubCommentList(string seq,
-                                                 string commentSeq,
-                                                 int pageSize,
-                                                 int pageNo)
+        public ListResponse<CommentM> ReadSubCommentList(RequestSubCommentListM request)
         {
             ListResponse<CommentM> response = new ListResponse<CommentM>();
 
-            List<CommentT> entities = boardService.GetSubCommentList(seq, commentSeq, pageSize, pageNo);
+            RequestSubCommentListMValidator validator = new RequestSubCommentListMValidator();
+            ValidationResult results = validator.Validate(request);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
+
+            List<CommentT> entities = boardService.GetSubCommentList(request.Seq, request.CommentSeq, request.PageSize, request.PageNo);
             List<CommentM> modelList = mapper.Map<List<CommentT>, List<CommentM>>(entities);
 
             if (modelList.Count > 0)
@@ -309,9 +340,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "게시물이 존재하지 않습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("대댓글 조회가 실패하였습니다.", "대댓글 조회 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -322,6 +351,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
         {
             int result = 0;
             Response response = new Response();
+
+            WriteSubCommentMValidator validator = new WriteSubCommentMValidator();
+            ValidationResult results = validator.Validate(comment);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.BoardController);
+            }
 
             CommentT entity = mapper.Map<WriteSubCommentM, CommentT>(comment);
 
@@ -335,9 +372,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.BadRequest).ToString();
-                response.ErrMsg = "대댓글 작성이 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("대댓글 작성이 실패하였습니다.", "대댓글 작성 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -360,9 +395,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.OK).ToString();
-                response.ErrMsg = "대댓글 삭제가 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("대댓글 삭제가 실패하였습니다.", "대댓글 삭제 오류", LayerID.BoardController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));

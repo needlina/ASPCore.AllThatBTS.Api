@@ -1,7 +1,10 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Filter;
 using ASPCore.AllThatBTS.Api.Middleware;
+using ASPCore.AllThatBTS.Api.Model;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Time;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Linq;
 using System.Text;
 
 namespace ASPCore.AllThatBTS.Api
@@ -27,6 +31,24 @@ namespace ASPCore.AllThatBTS.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Validators
+            //services.AddSingleton<IValidator<RequestBoardListM>, BoardValidator>();
+
+            //services.Configure<ApiBehaviorOptions>(options =>
+            //{
+            //    options.InvalidModelStateResponseFactory = (context) =>
+            //    {
+            //        var errors = context.ModelState.Values.SelectMany(x => x.Errors.Select(p => p.ErrorMessage)).ToList();
+            //        var result = new
+            //        {
+            //            Code = "00000",
+            //            Message = "Validation errors",
+            //            Errors = errors
+            //        };
+            //        return new BadRequestObjectResult(result);
+            //    };
+            //});
+
 
             TimeSource.Current = new CustomTimeZoneTimeSource()
             {
@@ -42,7 +64,7 @@ namespace ASPCore.AllThatBTS.Api
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddFluentValidation();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "All That BTS API", Version = "v1" });

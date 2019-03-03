@@ -1,12 +1,16 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Enum;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Service;
 using AutoMapper;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using NLog;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -36,6 +40,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             int result = 0;
             Response response = new Response();
 
+            MakeUserMValidator validator = new MakeUserMValidator();
+            ValidationResult results = validator.Validate(user);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.UserController);
+            }
+
             UserT userEntity = mapper.Map<MakeUserM, UserT> (user);
 
             result = userService.CreateUser(userEntity);
@@ -48,9 +60,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.BadRequest).ToString();
-                response.ErrMsg = "사용자 생성에 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("사용자 생성에 실패하였습니다.", "사용자 생성 오류", LayerID.UserController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -74,9 +84,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "사용자가 존재하지 않습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new NotFoundException("사용자가 존재하지 않습니다.", "사용자 조회 오류", LayerID.UserController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -99,9 +107,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.NotFound).ToString();
-                response.ErrMsg = "사용자가 존재하지 않습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new NotFoundException("사용자가 존재하지 않습니다.", "사용자 조회 오류", LayerID.UserController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -116,6 +122,14 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             int result = 0;
             Response response = new Response();
 
+            ModifyUserMValidator validator = new ModifyUserMValidator();
+            ValidationResult results = validator.Validate(user);
+
+            if (results.Errors.Count > 0)
+            {
+                throw new ValidationException("입력값을 확인해주세요.", results.Errors.Join("\r\n"), LayerID.UserController);
+            }
+
             UserT userEntity = mapper.Map<ModifyUserM, UserT>(user);
 
             result = userService.SetUser(userEntity);
@@ -128,9 +142,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.OK).ToString();
-                response.ErrMsg = "사용자 수정에 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("사용자 수정에 실패하였습니다.", "사용자 수정 오류", LayerID.UserController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));
@@ -154,9 +166,7 @@ namespace ASPCore.AllThatBTS.Api.Controllers
             }
             else
             {
-                response.Status = ((int)HttpStatusCode.OK).ToString();
-                response.ErrMsg = "사용자 삭제에 실패하였습니다.";
-                logger.Log(LogLevel.Warn, response.ErrMsg);
+                throw new BadRequestException("사용자 삭제에 실패하였습니다.", "사용자 삭제 오류", LayerID.UserController);
             }
 
             logger.Log(LogLevel.Info, string.Format("호출 성공 : {0}", MethodBase.GetCurrentMethod().Name));

@@ -28,19 +28,14 @@ namespace ASPCore.AllThatBTS.Api.Middleware
             {
                 await next(context);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
                 await HandleExceptionAsync(context, ex);
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static Task HandleExceptionAsync(HttpContext context, BaseException exception)
         {
-            var code = HttpStatusCode.InternalServerError; // 500 if unexpected
-
-            if (exception is NotFoundException) code = HttpStatusCode.NotFound;
-            else if (exception is UnauthorizedException) code = HttpStatusCode.Unauthorized;
-            else if (exception is BadRequestException) code = HttpStatusCode.BadRequest;
 
             GlobalDiagnosticsContext.Set("configDir", Path.Combine(Directory.GetCurrentDirectory(), "NLogFile"));
             string logConfigPath = string.Empty;
@@ -56,12 +51,13 @@ namespace ASPCore.AllThatBTS.Api.Middleware
 
             var logger = NLogBuilder.ConfigureNLog(logConfigPath).GetCurrentClassLogger();
 
-            logger.Log(LogLevel.Error, exception);
+            logger.Log(LogLevel.Error, exception, exception.Description);
 
             Response response = new Response()
             {
+                Message = exception.Description,
                 ErrMsg = exception.Message,
-                Status = ((int)code).ToString()
+                Status = exception.Code.ToString()
             };
 
             var result = JsonConvert.SerializeObject(response);

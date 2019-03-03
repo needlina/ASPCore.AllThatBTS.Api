@@ -130,4 +130,21 @@ namespace ASPCore.AllThatBTS.Api.Model
         public string SearchType { get; set; } = "";
         public string SearchKeyword { get; set; } = "";
     }
+
+    public class RequestCommentListM
+    {
+        public string Seq { get; set; }
+        public int PageNo { get; set; }
+        public int PageSize { get; set; }
+
+    }
+
+    public class RequestSubCommentListM
+    {
+        public string Seq { get; set; }
+        public string CommentSeq { get; set; }
+        public int PageSize { get; set; }
+        public int PageNo { get; set; }
+
+    }
 }

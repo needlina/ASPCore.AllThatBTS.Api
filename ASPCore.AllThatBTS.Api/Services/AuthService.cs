@@ -1,5 +1,6 @@
 ﻿using ASPCore.AllThatBTS.Api.Common;
 using ASPCore.AllThatBTS.Api.Entities;
+using ASPCore.AllThatBTS.Api.Enum;
 using ASPCore.AllThatBTS.Api.Model;
 using ASPCore.AllThatBTS.Api.Repository;
 using Microsoft.IdentityModel.Tokens;
@@ -82,20 +83,20 @@ namespace ASPCore.AllThatBTS.Api.Service
                 // Access Token 일치 여부
                 if(token.AccessToken != accessToken)
                 {
-                    throw new TokenErrorException("정상적인 토큰이 아닙니다.", "Invalid Token Error");
+                    throw new BadRequestException("정상적인 토큰이 아닙니다.", "토큰 오류", LayerID.AuthController);
                 }
 
                 // Refresh Token 만료시간 확인
                 if(token.RefreshTokenExpireDate < CommonHelper.GetDateTimeNow)
                 {
-                    throw new TokenErrorException("Refresh 토큰이 만료되었습니다. 다시 로그인 해주세요.", "Invalid Token Error");
+                    throw new UnauthorizedException("Refresh 토큰이 만료되었습니다. 다시 로그인 해주세요.", "권한 오류", LayerID.AuthController);
                 }
 
                 return token;
             }
             else
             {
-                throw new TokenErrorException("토큰이 존재하지 않습니다.", "Invalid Token Error");
+                throw new NotFoundException("토큰이 존재하지 않습니다.", "토큰 오류", LayerID.AuthController);
             }
             
         }
