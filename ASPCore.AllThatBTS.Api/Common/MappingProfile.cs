@@ -22,6 +22,15 @@ namespace ASPCore.AllThatBTS.Api.Common
 
             CreateMap<ArticleM, ArticleT>();
             CreateMap<ArticleT, ArticleM>();
+
+            CreateMap<YoutubeDataM, YoutubeT>();
+            CreateMap<YoutubeT, YoutubeDataM>();
+
+            CreateMap<TwitterDataM, TwitterT>();
+            CreateMap<TwitterT, TwitterDataM>();
+
+            CreateMap<InstagramDataM, InstagramT>();
+            CreateMap<InstagramT, InstagramDataM>();
         }
     }
 }

@@ -17,6 +17,10 @@ namespace ASPCore.AllThatBTS.Api.Model
     public class ListResponse<T> : CommonResponse
     {
         public List<T> ListResult { get; set; }
+        public long CurrentPage { get; set; } = 0;
+        public long TotalPages { get; set; } = 0;
+        public long TotalItems { get; set; } = 0;
+        public long ItemsPerPage { get; set; } = 0;
     }
 
     public class CommonResponse

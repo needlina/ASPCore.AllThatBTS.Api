@@ -45,5 +45,9 @@
         public const int UserController = 31000;
         public const int UserService = 32000;
         public const int UserRepository = 33000;
+
+        public const int CrawlerController = 41000;
+        public const int CrawlerService = 42000;
+        public const int CrawlerRepository = 43000;
     }
 }

@@ -59,6 +59,15 @@
     <None Update="SQL\InsertUser.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="SQL\SelectTwitterData.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SQL\SelectInstagramData.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SQL\SelectYoutubeData.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SQL\SelectAllUsers.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

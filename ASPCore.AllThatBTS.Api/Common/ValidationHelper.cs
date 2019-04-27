@@ -108,4 +108,13 @@ namespace ASPCore.AllThatBTS.Api.Common
         }
     }
 
+    public class RequestCralwerDataListMValidator : AbstractValidator<RequestCralwerDataListM>
+    {
+        public RequestCralwerDataListMValidator()
+        {
+            // Rules here
+
+        }
+    }
+
 }
